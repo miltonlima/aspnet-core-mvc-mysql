@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using MvcMovie.Attributes;
 
 namespace MvcMovie.Models
 {
@@ -29,6 +30,7 @@ namespace MvcMovie.Models
 
         [Required(ErrorMessage = "O CPF é obrigatório")]
         [StringLength(14, ErrorMessage = "O CPF deve ter no máximo 14 caracteres")]
+        [CpfValidation]
         [Display(Name = "CPF")]
         public string Cpf { get; set; } = string.Empty;
 
