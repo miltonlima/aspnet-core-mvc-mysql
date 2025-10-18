@@ -46,16 +46,24 @@ namespace MvcMovie.Controllers
         }
 
         // GET: Pessoas/Create
-        public IActionResult Create()
+        public async Task<IActionResult> Create()
         {
-            return View();
+            var model = new Pessoa
+            {
+                Matricula = await GenerateNextMatriculaAsync()
+            };
+            return View(model);
         }
 
         // POST: Pessoas/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,Nome,Nascimento,Cpf,Email,Matricula")] Pessoa pessoa)
+        public async Task<IActionResult> Create([Bind("Id,Nome,Nascimento,Cpf,Email")] Pessoa pessoa)
         {
+            pessoa.Matricula = await GenerateNextMatriculaAsync();
+
+            ModelState.Remove(nameof(Pessoa.Matricula)); // evita erro de Required
+
             if (ModelState.IsValid)
             {
                 _context.Add(pessoa);
@@ -84,34 +92,45 @@ namespace MvcMovie.Controllers
         // POST: Pessoas/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,Nome,Nascimento,Cpf,Email,Matricula")] Pessoa pessoa)
+        public async Task<IActionResult> Edit(int id, [Bind("Id,Nome,Nascimento,Cpf,Email")] Pessoa pessoa)
         {
             if (id != pessoa.Id)
             {
                 return NotFound();
             }
 
-            if (ModelState.IsValid)
+            ModelState.Remove(nameof(Pessoa.Matricula)); // evita erro de Required
+
+            if (!ModelState.IsValid)
             {
-                try
-                {
-                    _context.Update(pessoa);
-                    await _context.SaveChangesAsync();
-                }
-                catch (DbUpdateConcurrencyException)
-                {
-                    if (!PessoaExists(pessoa.Id))
-                    {
-                        return NotFound();
-                    }
-                    else
-                    {
-                        throw;
-                    }
-                }
-                return RedirectToAction(nameof(Index));
+                var current = await _context.Pessoa.AsNoTracking().FirstOrDefaultAsync(x => x.Id == id);
+                if (current != null) pessoa.Matricula = current.Matricula;
+                return View(pessoa);
             }
-            return View(pessoa);
+
+            var existing = await _context.Pessoa.FirstOrDefaultAsync(x => x.Id == id);
+            if (existing == null)
+            {
+                return NotFound();
+            }
+
+            existing.Nome = pessoa.Nome;
+            existing.Nascimento = pessoa.Nascimento;
+            existing.Cpf = pessoa.Cpf;
+            existing.Email = pessoa.Email;
+
+            try
+            {
+                await _context.SaveChangesAsync();
+            }
+            catch (DbUpdateConcurrencyException)
+            {
+                if (!PessoaExists(existing.Id))
+                    return NotFound();
+                throw;
+            }
+
+            return RedirectToAction(nameof(Index));
         }
 
         // GET: Pessoas/Delete/5
@@ -154,6 +173,26 @@ namespace MvcMovie.Controllers
         private bool PessoaExists(int id)
         {
           return (_context.Pessoa?.Any(e => e.Id == id)).GetValueOrDefault();
+        }
+
+        // Gera matrícula no formato yyyymmdd + sequência de 5 dígitos
+        private async Task<string> GenerateNextMatriculaAsync()
+        {
+            var prefix = DateTime.Now.ToString("yyyyMMdd");
+            var last = await _context.Pessoa
+                .Where(p => p.Matricula.StartsWith(prefix))
+                .Select(p => p.Matricula)
+                .OrderByDescending(m => m)
+                .FirstOrDefaultAsync();
+
+            var lastSeq = 0;
+            if (!string.IsNullOrEmpty(last) && last.Length > prefix.Length)
+            {
+                _ = int.TryParse(last.Substring(prefix.Length), out lastSeq);
+            }
+
+            var next = prefix + (lastSeq + 1).ToString("D5");
+            return next;
         }
     }
 }

@@ -41,7 +41,7 @@ namespace MvcMovie.Models
     public string Email { get; set; } = string.Empty;
 
     [Required(ErrorMessage = "A matrícula é obrigatória")]
-    [StringLength(11, ErrorMessage = "A matrícula deve ter no máximo 11 números")]
+    [StringLength(15, ErrorMessage = "A matrícula deve ter no máximo 15 números")]
     [Display(Name = "Matrícula")]
     public string Matricula { get; set; } = string.Empty;
     }

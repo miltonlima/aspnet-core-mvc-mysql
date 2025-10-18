@@ -16,8 +16,8 @@ namespace MvcMovie.Migrations
             migrationBuilder.AddColumn<string>(
                 name: "Matricula",
                 table: "Pessoa",
-                type: "varchar(11)",
-                maxLength: 11,
+                type: "varchar(15)",
+                maxLength: 15,
                 nullable: false,
                 defaultValue: ""
             ).Annotation("MySql:CharSet", "utf8mb4");
