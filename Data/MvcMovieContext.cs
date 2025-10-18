@@ -14,7 +14,8 @@ namespace MvcMovie.Data
         {
         }
 
-        public DbSet<MvcMovie.Models.Movie> Movie { get; set; } = default!;
-        public DbSet<MvcMovie.Models.Pessoa> Pessoa { get; set; } = default!;
+    public DbSet<MvcMovie.Models.Movie> Movie { get; set; } = default!;
+    public DbSet<MvcMovie.Models.Pessoa> Pessoa { get; set; } = default!;
+    public DbSet<MvcMovie.Models.Turma> Turma { get; set; } = default!;
     }
 }
