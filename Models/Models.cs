@@ -34,11 +34,16 @@ namespace MvcMovie.Models
         [Display(Name = "CPF")]
         public string Cpf { get; set; } = string.Empty;
 
-        [Required(ErrorMessage = "O email é obrigatório")]
-        [EmailAddress(ErrorMessage = "Email inválido")]
-        [StringLength(100, ErrorMessage = "O email deve ter no máximo 100 caracteres")]
-        [Display(Name = "Email")]
-        public string Email { get; set; } = string.Empty;
+    [Required(ErrorMessage = "O email é obrigatório")]
+    [EmailAddress(ErrorMessage = "Email inválido")]
+    [StringLength(100, ErrorMessage = "O email deve ter no máximo 100 caracteres")]
+    [Display(Name = "Email")]
+    public string Email { get; set; } = string.Empty;
+
+    [Required(ErrorMessage = "A matrícula é obrigatória")]
+    [StringLength(11, ErrorMessage = "A matrícula deve ter no máximo 11 números")]
+    [Display(Name = "Matrícula")]
+    public string Matricula { get; set; } = string.Empty;
     }
     public enum StatusTurma
     {

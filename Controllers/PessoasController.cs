@@ -54,7 +54,7 @@ namespace MvcMovie.Controllers
         // POST: Pessoas/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,Nome,Nascimento,Cpf,Email")] Pessoa pessoa)
+        public async Task<IActionResult> Create([Bind("Id,Nome,Nascimento,Cpf,Email,Matricula")] Pessoa pessoa)
         {
             if (ModelState.IsValid)
             {
@@ -84,7 +84,7 @@ namespace MvcMovie.Controllers
         // POST: Pessoas/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,Nome,Nascimento,Cpf,Email")] Pessoa pessoa)
+        public async Task<IActionResult> Edit(int id, [Bind("Id,Nome,Nascimento,Cpf,Email,Matricula")] Pessoa pessoa)
         {
             if (id != pessoa.Id)
             {
