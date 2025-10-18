@@ -18,7 +18,7 @@ namespace MvcMovie.Controllers
 
         public async Task<IActionResult> Index()
         {
-            var lista = await _context.Set<Modalidade>()
+            var lista = await _context.Modalidade
                 .Include(m => m.Turma)
                 .ToListAsync();
             return View(lista);
@@ -27,7 +27,7 @@ namespace MvcMovie.Controllers
         public async Task<IActionResult> Details(int? id)
         {
             if (id == null) return NotFound();
-            var modalidade = await _context.Set<Modalidade>()
+            var modalidade = await _context.Modalidade
                 .Include(m => m.Turma)
                 .FirstOrDefaultAsync(m => m.Id == id);
             if (modalidade == null) return NotFound();

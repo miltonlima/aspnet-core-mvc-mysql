@@ -2,15 +2,13 @@
 CREATE DATABASE IF NOT EXISTS `tst` DEFAULT CHARACTER SET utf8mb4;
 USE `tst`;
 
--- Cria a tabela em minúsculas (como a aplicação consulta)
-CREATE TABLE IF NOT EXISTS `modalidade` (
-  `Id` INT AUTO_INCREMENT PRIMARY KEY,
-  `Nome` VARCHAR(100) NOT NULL,
-  `TurmaId` INT NULL,
-  INDEX `IX_modalidade_TurmaId` (`TurmaId`)
+DROP TABLE IF EXISTS `modalidade`;
+CREATE TABLE `modalidade` (
+    `Id` int NOT NULL AUTO_INCREMENT,
+    `Nome` varchar(100) NOT NULL,
+    `TurmaId` int NULL,
+    PRIMARY KEY (`Id`),
+    KEY `IX_Modalidade_TurmaId` (`TurmaId`),
+    CONSTRAINT `FK_Modalidade_Turma` FOREIGN KEY (`TurmaId`) 
+    REFERENCES `turma` (`Id`) ON DELETE SET NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
-
--- Opcional: após confirmar o nome exato da tabela de Turmas, adicione a FK manualmente:
--- ALTER TABLE `modalidade`
---   ADD CONSTRAINT `FK_modalidade_Turma`
---   FOREIGN KEY (`TurmaId`) REFERENCES `Turma`(`Id`) ON DELETE SET NULL;
