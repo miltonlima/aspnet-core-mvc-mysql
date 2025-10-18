@@ -45,4 +45,6 @@ namespace MvcMovie.Models
         Ativa = 1,
         Inativa = 0
     }
+    // Certifique-se de que o campo Status na classe Turma está assim:
+    // public StatusTurma Status { get; set; }
 }
