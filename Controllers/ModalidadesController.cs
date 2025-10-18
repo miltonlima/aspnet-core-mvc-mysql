@@ -4,16 +4,19 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using MvcMovie.Data;
 using MvcMovie.Models;
+using MvcMovie.Services;
 
 namespace MvcMovie.Controllers
 {
     public class ModalidadesController : Controller
     {
         private readonly MvcMovieContext _context;
+        private readonly ModalidadeService _modalidadeService;
 
         public ModalidadesController(MvcMovieContext context)
         {
             _context = context;
+            _modalidadeService = new ModalidadeService(context);
         }
 
         public async Task<IActionResult> Index()
@@ -50,19 +53,33 @@ namespace MvcMovie.Controllers
             {
                 if (selectedTurmas != null)
                 {
-                    foreach (var turmaId in selectedTurmas)
+                    // Verifica se alguma das turmas já tem modalidade
+                    if (await _modalidadeService.ExisteCicloEntreModalidades(modalidade.Id, selectedTurmas))
                     {
-                        modalidade.ModalidadesTurmas.Add(new ModalidadeTurma
+                        ModelState.AddModelError("", "Uma ou mais turmas selecionadas já estão vinculadas a outras modalidades. Não é possível vincular a mesma turma a mais de uma modalidade.");
+                    }
+                    else
+                    {
+                        foreach (var turmaId in selectedTurmas)
                         {
-                            ModalidadeId = modalidade.Id,
-                            TurmaId = turmaId
-                        });
+                            modalidade.ModalidadesTurmas.Add(new ModalidadeTurma
+                            {
+                                ModalidadeId = modalidade.Id,
+                                TurmaId = turmaId
+                            });
+                        }
+                        
+                        _context.Add(modalidade);
+                        await _context.SaveChangesAsync();
+                        return RedirectToAction(nameof(Index));
                     }
                 }
-                
-                _context.Add(modalidade);
-                await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
+                else
+                {
+                    _context.Add(modalidade);
+                    await _context.SaveChangesAsync();
+                    return RedirectToAction(nameof(Index));
+                }
             }
             ViewBag.Turmas = new MultiSelectList(_context.Set<Turma>(), "Id", "Nome", selectedTurmas);
             return View(modalidade);
@@ -96,6 +113,18 @@ namespace MvcMovie.Controllers
 
                     if (modalidadeToUpdate == null) return NotFound();
 
+                    // Verifica se alguma das novas turmas selecionadas já tem modalidade
+                    // excluindo as turmas que já pertencem a esta modalidade
+                    var turmasAtuais = modalidadeToUpdate.ModalidadesTurmas.Select(mt => mt.TurmaId).ToArray();
+                    var novasTurmas = selectedTurmas?.Except(turmasAtuais).ToArray() ?? Array.Empty<int>();
+
+                    if (novasTurmas.Length > 0 && await _modalidadeService.ExisteCicloEntreModalidades(modalidade.Id, novasTurmas))
+                    {
+                        ModelState.AddModelError("", "Uma ou mais turmas selecionadas já estão vinculadas a outras modalidades. Não é possível vincular a mesma turma a mais de uma modalidade.");
+                        ViewBag.Turmas = new MultiSelectList(_context.Set<Turma>(), "Id", "Nome", selectedTurmas);
+                        return View(modalidade);
+                    }
+
                     modalidadeToUpdate.Nome = modalidade.Nome;
                     modalidadeToUpdate.ModalidadesTurmas.Clear();
 
@@ -112,13 +141,13 @@ namespace MvcMovie.Controllers
                     }
 
                     await _context.SaveChangesAsync();
+                    return RedirectToAction(nameof(Index));
                 }
                 catch (DbUpdateConcurrencyException)
                 {
                     if (!await _context.Set<Modalidade>().AnyAsync(e => e.Id == modalidade.Id)) return NotFound();
                     throw;
                 }
-                return RedirectToAction(nameof(Index));
             }
             ViewBag.Turmas = new MultiSelectList(_context.Set<Turma>(), "Id", "Nome", selectedTurmas);
             return View(modalidade);

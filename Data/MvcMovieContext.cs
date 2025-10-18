@@ -18,6 +18,7 @@ namespace MvcMovie.Data
     public DbSet<MvcMovie.Models.Pessoa> Pessoa { get; set; } = default!;
     public DbSet<MvcMovie.Models.Turma> Turma { get; set; } = default!;
     public DbSet<MvcMovie.Models.Modalidade> Modalidade { get; set; } = default!;
+    public DbSet<MvcMovie.Models.ModalidadeTurma> ModalidadeTurma { get; set; } = default!;
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -33,19 +34,19 @@ namespace MvcMovie.Data
             .HasDefaultValueSql("CURRENT_TIMESTAMP");
 
         // Configuração do relacionamento many-to-many entre Modalidade e Turma
-        modelBuilder.Entity<MvcMovie.Models.ModalidadeTurma>()
-            .ToTable("modalidade_turma")
-            .HasKey(mt => new { mt.ModalidadeId, mt.TurmaId });
+        modelBuilder.Entity<MvcMovie.Models.ModalidadeTurma>(entity =>
+        {
+            entity.ToTable("modalidade_turma");
+            entity.HasKey(mt => new { mt.ModalidadeId, mt.TurmaId });
 
-        modelBuilder.Entity<MvcMovie.Models.ModalidadeTurma>()
-            .HasOne(mt => mt.Modalidade)
-            .WithMany(m => m.ModalidadesTurmas)
-            .HasForeignKey(mt => mt.ModalidadeId);
+            entity.HasOne(mt => mt.Modalidade)
+                .WithMany(m => m.ModalidadesTurmas)
+                .HasForeignKey(mt => mt.ModalidadeId);
 
-        modelBuilder.Entity<MvcMovie.Models.ModalidadeTurma>()
-            .HasOne(mt => mt.Turma)
-            .WithMany(t => t.ModalidadesTurmas)
-            .HasForeignKey(mt => mt.TurmaId);
+            entity.HasOne(mt => mt.Turma)
+                .WithMany(t => t.ModalidadesTurmas)
+                .HasForeignKey(mt => mt.TurmaId);
+        });
     }
     }
 }
