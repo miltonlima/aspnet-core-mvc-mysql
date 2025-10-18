@@ -33,3 +33,6 @@ namespace MvcMovie.Models
         public DateTime DataCriacao { get; set; } = DateTime.Now;
     }
 }
+
+// Certifique-se de que só existe UMA definição da classe Turma neste namespace.
+// Remova ou renomeie a duplicata em outro arquivo do projeto.

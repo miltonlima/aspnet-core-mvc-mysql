@@ -29,11 +29,6 @@
                 <select asp-for="Status" class="form-control" asp-items="Html.GetEnumSelectList<MvcMovie.Models.StatusTurma>()"></select>
                 <span asp-validation-for="Status" class="text-danger"></span>
             </div>
-            <div class="form-group mb-3">
-                <label asp-for="DataCriacao" class="form-label"></label>
-                <input asp-for="DataCriacao" class="form-control" type="datetime-local" readonly />
-                <span asp-validation-for="DataCriacao" class="text-danger"></span>
-            </div>
             <div class="form-group">
                 <input type="submit" value="Salvar" class="btn btn-primary" />
                 <a asp-action="Index" class="btn btn-secondary">Voltar à Lista</a>

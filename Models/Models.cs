@@ -45,31 +45,4 @@ namespace MvcMovie.Models
         Ativa = 1,
         Inativa = 0
     }
-
-    public class Turma
-    {
-        public int Id { get; set; }
-
-        [Required(ErrorMessage = "O nome da turma é obrigatório")]
-        [StringLength(100, ErrorMessage = "O nome deve ter no máximo 100 caracteres")]
-        [Display(Name = "Nome da Turma")]
-        public string Nome { get; set; } = string.Empty;
-
-        [Required(ErrorMessage = "A data de início é obrigatória")]
-        [DataType(DataType.Date)]
-        [Display(Name = "Data de Início")]
-        public DateTime DataInicio { get; set; }
-
-        [Required(ErrorMessage = "A data de fim é obrigatória")]
-        [DataType(DataType.Date)]
-        [Display(Name = "Data de Fim")]
-        public DateTime DataFim { get; set; }
-
-        [Required(ErrorMessage = "O status é obrigatório")]
-        [Display(Name = "Status")]
-        public StatusTurma Status { get; set; }
-
-        [Display(Name = "Data de Criação")]
-        public DateTime DataCriacao { get; set; } = DateTime.Now;
-    }
 }
