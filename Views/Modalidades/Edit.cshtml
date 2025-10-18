@@ -1,0 +1,29 @@
+@model MvcMovie.Models.Modalidade
+@{
+    ViewData["Title"] = "Editar Modalidade";
+}
+<h1>Editar Modalidade</h1>
+<hr />
+<form asp-action="Edit">
+    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+    <input type="hidden" asp-for="Id" />
+    <div class="mb-3">
+        <label asp-for="Nome" class="form-label"></label>
+        <input asp-for="Nome" class="form-control" />
+        <span asp-validation-for="Nome" class="text-danger"></span>
+    </div>
+    <div class="mb-3">
+        <label asp-for="TurmaId" class="form-label"></label>
+        <select asp-for="TurmaId" class="form-control" asp-items="ViewBag.TurmaId">
+            <option value="">(Nenhuma)</option>
+        </select>
+        <span asp-validation-for="TurmaId" class="text-danger"></span>
+    </div>
+    <div>
+        <input type="submit" value="Salvar" class="btn btn-primary" />
+        <a asp-action="Index" class="btn btn-secondary">Voltar à Lista</a>
+    </div>
+</form>
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

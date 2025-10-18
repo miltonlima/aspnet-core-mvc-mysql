@@ -17,6 +17,7 @@ namespace MvcMovie.Data
     public DbSet<MvcMovie.Models.Movie> Movie { get; set; } = default!;
     public DbSet<MvcMovie.Models.Pessoa> Pessoa { get; set; } = default!;
     public DbSet<MvcMovie.Models.Turma> Turma { get; set; } = default!;
+    public DbSet<MvcMovie.Models.Modalidade> Modalidade { get; set; } = default!;
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -30,6 +31,13 @@ namespace MvcMovie.Data
             .Property(t => t.DataCriacao)
             .ValueGeneratedOnAdd()
             .HasDefaultValueSql("CURRENT_TIMESTAMP");
+
+            // Se desejar, garantir mapeamento da FK opcional (não obrigatório)
+            modelBuilder.Entity<MvcMovie.Models.Modalidade>()
+                .HasOne(m => m.Turma)
+                .WithMany() // ou .WithMany(t => t.Modalidades) se adicionar colecção em Turma
+                .HasForeignKey(m => m.TurmaId)
+                .OnDelete(DeleteBehavior.SetNull);
     }
     }
 }
