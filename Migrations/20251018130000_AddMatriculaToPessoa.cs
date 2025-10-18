@@ -1,9 +1,14 @@
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Infrastructure;
+using MvcMovie.Data;
 using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
 namespace MvcMovie.Migrations
 {
+    [DbContext(typeof(MvcMovieContext))]
+    [Migration("20251018130000_AddMatriculaToPessoa")]
     public partial class AddMatriculaToPessoa : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
