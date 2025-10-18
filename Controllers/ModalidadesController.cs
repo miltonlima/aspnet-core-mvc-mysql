@@ -41,7 +41,11 @@ namespace MvcMovie.Controllers
 
         public IActionResult Create()
         {
-            ViewBag.Turmas = new MultiSelectList(_context.Set<Turma>(), "Id", "Nome");
+            // Seleciona apenas turmas que não estão em nenhuma modalidade
+            var turmasNaoAtribuidas = _context.Turma
+                .Where(t => !_context.ModalidadeTurma.Any(mt => mt.TurmaId == t.Id))
+                .ToList();
+            ViewBag.Turmas = turmasNaoAtribuidas;
             return View();
         }
 
@@ -81,7 +85,9 @@ namespace MvcMovie.Controllers
                     return RedirectToAction(nameof(Index));
                 }
             }
-            ViewBag.Turmas = new MultiSelectList(_context.Set<Turma>(), "Id", "Nome", selectedTurmas);
+            ViewBag.Turmas = _context.Turma
+                .Where(t => !_context.ModalidadeTurma.Any(mt => mt.TurmaId == t.Id))
+                .ToList();
             return View(modalidade);
         }
 
@@ -92,9 +98,15 @@ namespace MvcMovie.Controllers
                 .Include(m => m.ModalidadesTurmas)
                 .FirstOrDefaultAsync(m => m.Id == id);
             if (modalidade == null) return NotFound();
-            
-            var selectedTurmas = modalidade.ModalidadesTurmas.Select(mt => mt.TurmaId).ToArray();
-            ViewBag.Turmas = new MultiSelectList(_context.Set<Turma>(), "Id", "Nome", selectedTurmas);
+
+            // Turmas já atribuídas a esta modalidade
+            var turmasAtribuidas = modalidade.ModalidadesTurmas.Select(mt => mt.TurmaId).ToList();
+            // Turmas não atribuídas a nenhuma modalidade ou já atribuídas a esta modalidade
+            var turmasDisponiveis = _context.Turma
+                .Where(t => !_context.ModalidadeTurma.Any(mt => mt.TurmaId == t.Id && mt.ModalidadeId != modalidade.Id))
+                .ToList();
+            ViewBag.Turmas = turmasDisponiveis;
+            ViewBag.SelectedTurmas = turmasAtribuidas;
             return View(modalidade);
         }
 
@@ -149,7 +161,12 @@ namespace MvcMovie.Controllers
                     throw;
                 }
             }
-            ViewBag.Turmas = new MultiSelectList(_context.Set<Turma>(), "Id", "Nome", selectedTurmas);
+            // Turmas não atribuídas a nenhuma modalidade ou já atribuídas a esta modalidade
+            var turmasDisponiveis = _context.Turma
+                .Where(t => !_context.ModalidadeTurma.Any(mt => mt.TurmaId == t.Id && mt.ModalidadeId != modalidade.Id))
+                .ToList();
+            ViewBag.Turmas = turmasDisponiveis;
+            ViewBag.SelectedTurmas = selectedTurmas;
             return View(modalidade);
         }
 

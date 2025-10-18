@@ -14,10 +14,29 @@
     </div>
     <div class="mb-3">
         <label class="form-label">Turmas</label>
-        <select name="selectedTurmas" multiple class="form-select" asp-items="ViewBag.Turmas">
-        </select>
-        <small class="form-text text-muted">Segure Ctrl para selecionar múltiplas turmas</small>
+        <button type="button" class="btn btn-sm btn-outline-primary mb-2" onclick="marcarTodosTurmas()">Marcar/Desmarcar todos</button>
+        <div>
+        @{
+            var turmas = (IEnumerable<MvcMovie.Models.Turma>)ViewBag.Turmas;
+            var selectedTurmas = ViewBag.SelectedTurmas as IEnumerable<int> ?? new List<int>();
+        }
+        @foreach (var turma in turmas)
+        {
+            <div class="form-check">
+                <input class="form-check-input turma-checkbox" type="checkbox" name="selectedTurmas" value="@turma.Id" id="turma_@turma.Id" @(selectedTurmas.Contains(turma.Id) ? "checked" : "") />
+                <label class="form-check-label" for="turma_@turma.Id">@turma.Nome</label>
+            </div>
+        }
+        </div>
+        <small class="form-text text-muted">Marque as turmas que deseja atribuir à modalidade</small>
     </div>
+    <script>
+        function marcarTodosTurmas() {
+            const boxes = document.querySelectorAll('.turma-checkbox');
+            const allChecked = Array.from(boxes).every(cb => cb.checked);
+            boxes.forEach(cb => cb.checked = !allChecked);
+        }
+    </script>
     <div>
         <input type="submit" value="Salvar" class="btn btn-primary" />
         <a asp-action="Index" class="btn btn-secondary">Voltar à Lista</a>
