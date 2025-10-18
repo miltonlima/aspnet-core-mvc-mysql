@@ -13,11 +13,10 @@
         <span asp-validation-for="Nome" class="text-danger"></span>
     </div>
     <div class="mb-3">
-        <label asp-for="TurmaId" class="form-label"></label>
-        <select asp-for="TurmaId" class="form-control" asp-items="ViewBag.TurmaId">
-            <option value="">(Nenhuma)</option>
+        <label class="form-label">Turmas</label>
+        <select name="selectedTurmas" multiple class="form-select" asp-items="ViewBag.Turmas">
         </select>
-        <span asp-validation-for="TurmaId" class="text-danger"></span>
+        <small class="form-text text-muted">Segure Ctrl para selecionar múltiplas turmas</small>
     </div>
     <div>
         <input type="submit" value="Salvar" class="btn btn-primary" />

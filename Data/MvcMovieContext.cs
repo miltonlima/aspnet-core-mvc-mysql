@@ -32,12 +32,20 @@ namespace MvcMovie.Data
             .ValueGeneratedOnAdd()
             .HasDefaultValueSql("CURRENT_TIMESTAMP");
 
-            // Se desejar, garantir mapeamento da FK opcional (não obrigatório)
-            modelBuilder.Entity<MvcMovie.Models.Modalidade>()
-                .HasOne(m => m.Turma)
-                .WithMany() // ou .WithMany(t => t.Modalidades) se adicionar colecção em Turma
-                .HasForeignKey(m => m.TurmaId)
-                .OnDelete(DeleteBehavior.SetNull);
+        // Configuração do relacionamento many-to-many entre Modalidade e Turma
+        modelBuilder.Entity<MvcMovie.Models.ModalidadeTurma>()
+            .ToTable("modalidade_turma")
+            .HasKey(mt => new { mt.ModalidadeId, mt.TurmaId });
+
+        modelBuilder.Entity<MvcMovie.Models.ModalidadeTurma>()
+            .HasOne(mt => mt.Modalidade)
+            .WithMany(m => m.ModalidadesTurmas)
+            .HasForeignKey(mt => mt.ModalidadeId);
+
+        modelBuilder.Entity<MvcMovie.Models.ModalidadeTurma>()
+            .HasOne(mt => mt.Turma)
+            .WithMany(t => t.ModalidadesTurmas)
+            .HasForeignKey(mt => mt.TurmaId);
     }
     }
 }

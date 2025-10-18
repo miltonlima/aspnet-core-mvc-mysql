@@ -19,7 +19,8 @@ namespace MvcMovie.Controllers
         public async Task<IActionResult> Index()
         {
             var lista = await _context.Modalidade
-                .Include(m => m.Turma)
+                .Include(m => m.ModalidadesTurmas)
+                    .ThenInclude(mt => mt.Turma)
                 .ToListAsync();
             return View(lista);
         }
@@ -28,7 +29,8 @@ namespace MvcMovie.Controllers
         {
             if (id == null) return NotFound();
             var modalidade = await _context.Modalidade
-                .Include(m => m.Turma)
+                .Include(m => m.ModalidadesTurmas)
+                    .ThenInclude(mt => mt.Turma)
                 .FirstOrDefaultAsync(m => m.Id == id);
             if (modalidade == null) return NotFound();
             return View(modalidade);
@@ -36,43 +38,79 @@ namespace MvcMovie.Controllers
 
         public IActionResult Create()
         {
-            ViewData["TurmaId"] = new SelectList(_context.Set<Turma>(), "Id", "Nome");
+            ViewBag.Turmas = new MultiSelectList(_context.Set<Turma>(), "Id", "Nome");
             return View();
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,Nome,TurmaId")] Modalidade modalidade)
+        public async Task<IActionResult> Create([Bind("Id,Nome")] Modalidade modalidade, int[] selectedTurmas)
         {
             if (ModelState.IsValid)
             {
+                if (selectedTurmas != null)
+                {
+                    foreach (var turmaId in selectedTurmas)
+                    {
+                        modalidade.ModalidadesTurmas.Add(new ModalidadeTurma
+                        {
+                            ModalidadeId = modalidade.Id,
+                            TurmaId = turmaId
+                        });
+                    }
+                }
+                
                 _context.Add(modalidade);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["TurmaId"] = new SelectList(_context.Set<Turma>(), "Id", "Nome", modalidade.TurmaId);
+            ViewBag.Turmas = new MultiSelectList(_context.Set<Turma>(), "Id", "Nome", selectedTurmas);
             return View(modalidade);
         }
 
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null) return NotFound();
-            var modalidade = await _context.Set<Modalidade>().FindAsync(id);
+            var modalidade = await _context.Modalidade
+                .Include(m => m.ModalidadesTurmas)
+                .FirstOrDefaultAsync(m => m.Id == id);
             if (modalidade == null) return NotFound();
-            ViewData["TurmaId"] = new SelectList(_context.Set<Turma>(), "Id", "Nome", modalidade.TurmaId);
+            
+            var selectedTurmas = modalidade.ModalidadesTurmas.Select(mt => mt.TurmaId).ToArray();
+            ViewBag.Turmas = new MultiSelectList(_context.Set<Turma>(), "Id", "Nome", selectedTurmas);
             return View(modalidade);
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,Nome,TurmaId")] Modalidade modalidade)
+        public async Task<IActionResult> Edit(int id, [Bind("Id,Nome")] Modalidade modalidade, int[] selectedTurmas)
         {
             if (id != modalidade.Id) return NotFound();
             if (ModelState.IsValid)
             {
                 try
                 {
-                    _context.Update(modalidade);
+                    var modalidadeToUpdate = await _context.Modalidade
+                        .Include(m => m.ModalidadesTurmas)
+                        .FirstOrDefaultAsync(m => m.Id == id);
+
+                    if (modalidadeToUpdate == null) return NotFound();
+
+                    modalidadeToUpdate.Nome = modalidade.Nome;
+                    modalidadeToUpdate.ModalidadesTurmas.Clear();
+
+                    if (selectedTurmas != null)
+                    {
+                        foreach (var turmaId in selectedTurmas)
+                        {
+                            modalidadeToUpdate.ModalidadesTurmas.Add(new ModalidadeTurma
+                            {
+                                ModalidadeId = modalidade.Id,
+                                TurmaId = turmaId
+                            });
+                        }
+                    }
+
                     await _context.SaveChangesAsync();
                 }
                 catch (DbUpdateConcurrencyException)
@@ -82,7 +120,7 @@ namespace MvcMovie.Controllers
                 }
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["TurmaId"] = new SelectList(_context.Set<Turma>(), "Id", "Nome", modalidade.TurmaId);
+            ViewBag.Turmas = new MultiSelectList(_context.Set<Turma>(), "Id", "Nome", selectedTurmas);
             return View(modalidade);
         }
 

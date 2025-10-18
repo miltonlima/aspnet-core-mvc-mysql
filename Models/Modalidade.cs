@@ -12,10 +12,6 @@ namespace MvcMovie.Models
         [Display(Name = "Nome da Modalidade")]
         public string Nome { get; set; } = string.Empty;
 
-        [Display(Name = "Turma (opcional)")]
-        public int? TurmaId { get; set; }
-
-        [ForeignKey("TurmaId")]
-        public Turma? Turma { get; set; }
+        public ICollection<ModalidadeTurma> ModalidadesTurmas { get; set; } = new List<ModalidadeTurma>();
     }
 }

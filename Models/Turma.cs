@@ -31,6 +31,8 @@ namespace MvcMovie.Models
         [Display(Name = "Data de Criação")]
         [DataType(DataType.DateTime)]
         public DateTime DataCriacao { get; set; } = DateTime.Now;
+
+        public ICollection<ModalidadeTurma> ModalidadesTurmas { get; set; } = new List<ModalidadeTurma>();
     }
 }
 
